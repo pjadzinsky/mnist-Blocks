@@ -2,21 +2,26 @@
 from blocks.bricks import MLP, Tanh, Softmax
 from blocks.bricks.cost import CategoricalCrossEntropy, MisclassificationRate
 from blocks.initialization import IsotropicGaussian, Constant
-from theano import tensor
-from theano.tensor.basic import Flatten
+from blocks.main_loop import MainLoop
+from blocks.algorithms import GradientDescent, Scale
+from blocks.extensions import FinishAfter, Printing
+from blocks.extensions.monitoring import DataStreamMonitoring
+from blocks.graph import ComputationGraph
+import theano.tensor as T
 
 # data
 from fuel.datasets import MNIST
 from fuel.streams import DataStream
 from fuel.schemes import SequentialScheme
+from fuel.transformers import Flatten
 
 # Construct the model
 mlp = MLP(activations=[Tanh(), Softmax()], dims=[784, 100, 10], weights_init=IsotropicGaussian(0.01), biases_init=Constant(0))
 mlp.initialize()
 
 # Calculate the loss function
-x = tensor.matrix('features')
-y = tensor.lmatrix('targets')
+x = T.matrix('features')
+y = T.lmatrix('targets')
 y_hat = mlp.apply(x)
 cost = CategoricalCrossEntropy().apply(y.flatten(), y_hat)
 error_rate = MisclassificationRate().apply(y.flatten(), y_hat)
