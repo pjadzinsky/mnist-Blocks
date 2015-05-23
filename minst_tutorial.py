@@ -1,5 +1,5 @@
 # imports
-from blocks.bricks import MLP, Tanh, Softmax
+from blocks.bricks import MLP, Tanh, Rectifier, Softmax
 from blocks.bricks.cost import CategoricalCrossEntropy, MisclassificationRate
 from blocks.initialization import IsotropicGaussian, Constant
 from blocks.main_loop import MainLoop
@@ -16,7 +16,7 @@ from fuel.schemes import SequentialScheme
 from fuel.transformers import Flatten
 
 # Construct the model
-mlp = MLP(activations=[Tanh(), Softmax()], dims=[784, 100, 10], weights_init=IsotropicGaussian(0.01), biases_init=Constant(0))
+mlp = MLP(activations=[Rectifier(), Softmax()], dims=[784, 100, 10], weights_init=IsotropicGaussian(0.01), biases_init=Constant(0))
 mlp.initialize()
 
 # Calculate the loss function
