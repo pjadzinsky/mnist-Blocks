@@ -20,6 +20,7 @@ batch_size = 128
 filter_size = 3
 num_filters = 4
 initial_weight_std = .01
+epochs = 5
 
 x = T.tensor4('features')
 y = T.lmatrix('targets')
@@ -57,6 +58,7 @@ y_hat = mlp.apply(features)
 # numerically stable softmax
 cost = Softmax().categorical_cross_entropy(y.flatten(), y_hat)
 cost.name = 'nll'
+error_rate = MisclassificationRate().apply(y.flatten(), y_hat)
 #cost = MisclassificationRate().apply(y, y_hat)
 #cost.name = 'error_rate'
 
@@ -123,13 +125,13 @@ main_loop = MainLoop(
         data_stream = training_stream,
         algorithm = algorithm,
         extensions = [
-            FinishAfter(after_n_epochs=10),
+            FinishAfter(after_n_epochs=epochs),
             TrainingDataMonitoring(
                 [cost],
                 prefix='train',
                 after_epoch=True),
             DataStreamMonitoring(
-                [cost],
+                [cost, error_rate],
                 validation_stream,
                 prefix='valid'),
             Checkpoint('mnist.pkl', after_epoch=True),
